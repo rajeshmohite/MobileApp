@@ -6,4 +6,5 @@ import com.mobileapp.ws.dto.UserDto;
 
 public interface UserService extends UserDetailsService{
 	UserDto createUser(UserDto dto);
+	UserDto getUser(String email);
 }
