@@ -17,6 +17,9 @@ import com.mobileapp.ws.exceptions.UserServiceException;
 import com.mobileapp.ws.service.UserService;
 import com.mobileapp.ws.ui.model.request.UserDetailsRequestModel;
 import com.mobileapp.ws.ui.model.response.ErrorMessages;
+import com.mobileapp.ws.ui.model.response.OperationStatusModel;
+import com.mobileapp.ws.ui.model.response.RequestOperationName;
+import com.mobileapp.ws.ui.model.response.RequestOperationStatus;
 import com.mobileapp.ws.ui.model.response.UserDetailsResponseModel;
 
 @RestController
@@ -74,9 +77,15 @@ public class UserController {
 		return returnUser;
 	}
 
-	@DeleteMapping
-	public String deleteUser() {
-		return "delete user";
+	@DeleteMapping(path = "/{userId}", produces = { MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE })
+	public OperationStatusModel deleteUser(@PathVariable String userId) {
+		OperationStatusModel returnObj = new OperationStatusModel();
+		returnObj.setOperationName(RequestOperationName.DELETE.name());
+
+		userService.deleteUser(userId);
+
+		returnObj.setOperationResult(RequestOperationStatus.SUCCESS.name());
+		return returnObj;
 	}
 
 }
