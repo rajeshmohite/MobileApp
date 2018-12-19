@@ -3,6 +3,7 @@ package com.mobileapp.ws.service.impl;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -14,6 +15,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.mobileapp.ws.dto.AddressDTO;
 import com.mobileapp.ws.dto.UserDto;
 import com.mobileapp.ws.io.entity.UserEntity;
 import com.mobileapp.ws.repository.UserRepository;
@@ -33,20 +35,27 @@ public class UserServiceImpl implements UserService {
 	BCryptPasswordEncoder bCryptPasswordEncoder;
 
 	@Override
-	public UserDto createUser(UserDto dto) {
+	public UserDto createUser(UserDto user) {
+		ModelMapper modelMapper = new ModelMapper();
 
-		if (userRepository.findByEmail(dto.getEmail()) != null)
+		if (userRepository.findByEmail(user.getEmail()) != null)
 			throw new RuntimeException("Record with this Email id exist!!!");
 
-		UserEntity userEntity = new UserEntity();
-		BeanUtils.copyProperties(dto, userEntity);
+		for (int i = 0; i < user.getAddresses().size(); i++) {
+			AddressDTO addressDTO = user.getAddresses().get(i);
+			addressDTO.setUserDetails(user);
+			addressDTO.setAddressId(utils.generateAddressId(30));
+			user.getAddresses().set(i, addressDTO);
+		}
 
-		userEntity.setEncryptedPassword(bCryptPasswordEncoder.encode(dto.getPassword()));
+		UserEntity userEntity = modelMapper.map(user, UserEntity.class);
+
+		userEntity.setEncryptedPassword(bCryptPasswordEncoder.encode(user.getPassword()));
 		userEntity.setUserId(utils.generateUserId(30));
+
 		UserEntity userEntity2 = userRepository.save(userEntity);
 
-		UserDto returnUser = new UserDto();
-		BeanUtils.copyProperties(userEntity2, returnUser);
+		UserDto returnUser = modelMapper.map(userEntity2, UserDto.class);
 
 		return returnUser;
 	}

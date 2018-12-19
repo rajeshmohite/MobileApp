@@ -3,6 +3,7 @@ package com.mobileapp.ws.controller;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -46,7 +47,7 @@ public class UserController {
 	@PostMapping(produces = { MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE }, consumes = {
 			MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE })
 	public UserDetailsResponseModel createUser(@RequestBody UserDetailsRequestModel userDetails) throws Exception {
-		UserDetailsResponseModel returnUser = new UserDetailsResponseModel();
+		ModelMapper modelMapper = new ModelMapper();
 
 		if (userDetails.getFirstName().isEmpty())
 			throw new UserServiceException(ErrorMessages.MISSING_REQUIRED_FIELD.getErrorMessage());
@@ -55,12 +56,9 @@ public class UserController {
 		if (userDetails.getPassword().isEmpty())
 			throw new NullPointerException("The Object is Null");
 
-		UserDto userDto = new UserDto();
-		BeanUtils.copyProperties(userDetails, userDto);
-
+		UserDto userDto = modelMapper.map(userDetails, UserDto.class);
 		UserDto userDto2 = userService.createUser(userDto);
-		BeanUtils.copyProperties(userDto2, returnUser);
-
+		UserDetailsResponseModel returnUser = modelMapper.map(userDto2, UserDetailsResponseModel.class);
 		return returnUser;
 	}
 

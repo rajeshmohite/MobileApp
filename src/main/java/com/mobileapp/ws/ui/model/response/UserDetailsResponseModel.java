@@ -1,10 +1,13 @@
 package com.mobileapp.ws.ui.model.response;
 
+import java.util.List;
+
 public class UserDetailsResponseModel {
 	private String userId;
 	private String firstName;
 	private String lastName;
 	private String email;
+	private List<AddressDetailsResponseModel> addresses;
 
 	public String getUserId() {
 		return userId;
@@ -36,6 +39,14 @@ public class UserDetailsResponseModel {
 
 	public void setEmail(String email) {
 		this.email = email;
+	}
+
+	public List<AddressDetailsResponseModel> getAddresses() {
+		return addresses;
+	}
+
+	public void setAddresses(List<AddressDetailsResponseModel> addresses) {
+		this.addresses = addresses;
 	}
 
 }
